@@ -177,6 +177,19 @@ const MLB = {
       return [];
     }
   },
+
+  async getPlayerSeasonHitting(id, season) {
+    try {
+      const res = await fetchWithTimeout(
+        `${MLB.base}/people/${id}/stats?stats=season&group=hitting&season=${season}&sportId=1`,
+        6000
+      );
+      const data = await res.json();
+      return data.stats?.[0]?.splits?.[0]?.stat || null;
+    } catch (e) {
+      return null;
+    }
+  },
 };
 
 /* ── State ──────────────────────────────────────────────────────── */
@@ -356,6 +369,18 @@ function buildCardElement(card) {
 
     const ltable = document.createElement('table');
     ltable.className = 'lineup-table';
+
+    const lthead = document.createElement('thead');
+    const htr = document.createElement('tr');
+    ['', 'Player', 'AVG', 'OBP', 'SLG'].forEach((col, i) => {
+      const th = document.createElement('th');
+      th.className = i <= 1 ? 'lineup-th-left' : 'lineup-th-stat';
+      th.textContent = col;
+      htr.appendChild(th);
+    });
+    lthead.appendChild(htr);
+    ltable.appendChild(lthead);
+
     const ltbody = document.createElement('tbody');
     card.depthChart.forEach(row => {
       const tr = document.createElement('tr');
@@ -365,7 +390,16 @@ function buildCardElement(card) {
       const nameTd = document.createElement('td');
       nameTd.className = 'lineup-player';
       nameTd.textContent = row.name;
-      tr.append(posTd, nameTd);
+      const avgTd = document.createElement('td');
+      avgTd.className = 'lineup-stat';
+      avgTd.textContent = row.avg ? fmtAvg(row.avg) : '—';
+      const obpTd = document.createElement('td');
+      obpTd.className = 'lineup-stat';
+      obpTd.textContent = row.obp ? fmtAvg(row.obp) : '—';
+      const slgTd = document.createElement('td');
+      slgTd.className = 'lineup-stat';
+      slgTd.textContent = row.slg ? fmtAvg(row.slg) : '—';
+      tr.append(posTd, nameTd, avgTd, obpTd, slgTd);
       ltbody.appendChild(tr);
     });
     ltable.appendChild(ltbody);
@@ -378,8 +412,9 @@ function buildCardElement(card) {
 
 /* ── Card track ─────────────────────────────────────────────────── */
 function slotWidth() {
-  const peek = window.innerWidth <= 700 ? 40 : 64;
-  return Math.max(200, dom.cardTrack.clientWidth - peek * 2);
+  const peek = window.innerWidth <= 700 ? 56 : 72;
+  const sidebarW = window.innerWidth > 700 ? 259 : 0;
+  return Math.max(200, window.innerWidth - sidebarW - peek * 2);
 }
 
 function renderCardTrack() {
@@ -401,7 +436,8 @@ function scrollToCard(idx, animate = true) {
   const slots = dom.cardTrack.querySelectorAll('.card-slot');
   if (!slots[idx]) return;
   const slot = slots[idx];
-  const targetLeft = slot.offsetLeft - (dom.cardTrack.clientWidth - slot.offsetWidth) / 2;
+  const peek = window.innerWidth <= 700 ? 56 : 72;
+  const targetLeft = slot.offsetLeft - peek;
   dom.cardTrack.scrollTo({ left: targetLeft, behavior: animate ? 'smooth' : 'instant' });
 }
 
@@ -936,9 +972,19 @@ async function buildTeamCard(teamId, teamName) {
     const pos = entry.position?.abbreviation;
     if (!pos || !POS_ORDER.includes(pos) || seen.has(pos)) continue;
     seen.add(pos);
-    depthChart.push({ pos, name: entry.person?.fullName || '' });
+    depthChart.push({ pos, name: entry.person?.fullName || '', id: entry.person?.id || null });
   }
   depthChart.sort((a, b) => POS_ORDER.indexOf(a.pos) - POS_ORDER.indexOf(b.pos));
+
+  // Fetch current-season hitting stats for each lineup player in parallel
+  const playerStats = await Promise.all(
+    depthChart.map(p => p.id ? MLB.getPlayerSeasonHitting(p.id, curYear) : Promise.resolve(null))
+  );
+  playerStats.forEach((stat, i) => {
+    depthChart[i].avg = stat?.avg  ?? null;
+    depthChart[i].obp = stat?.obp  ?? null;
+    depthChart[i].slg = stat?.slg  ?? null;
+  });
 
   return {
     type: 'team', subtype: 'team',

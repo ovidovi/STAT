@@ -32,8 +32,8 @@ ul { list-style: none; }
   --radius-card:  10px;
   --radius-sm:    4px;
 
-  /* Card track peek */
-  --track-pad:    64px;
+  /* Card track peek (left margin + right peek of next card) */
+  --track-pad:    72px;
 }
 
 /* ── Base ───────────────────────────────────────────────────────── */
@@ -491,6 +491,7 @@ html, body {
   overflow-x: scroll;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--track-pad);
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   padding-inline: var(--track-pad);
@@ -670,6 +671,7 @@ html, body {
   text-align: right;
   padding: 10px 8px;
   border-bottom: 1px solid var(--border);
+  white-space: nowrap;
 }
 
 .stat-row:last-child td { border-bottom: none; }
@@ -695,7 +697,6 @@ html, body {
 .card-lineup {
   flex-shrink: 0;
   border-top: 1px solid var(--border);
-  padding-bottom: 8px;
 }
 
 .lineup-label {
@@ -707,23 +708,63 @@ html, body {
   padding: 10px var(--pad-card) 6px;
 }
 
-.lineup-table { width: 100%; border-collapse: collapse; }
+.lineup-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.lineup-th-left,
+.lineup-th-stat {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 6px 8px 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.lineup-th-left:first-child { padding-left: var(--pad-card); width: 44px; }
+.lineup-th-left:nth-child(2) { text-align: left; }
+.lineup-th-stat { text-align: right; width: 44px; }
+.lineup-th-stat:last-child { padding-right: var(--pad-card); width: 52px; }
 
 .lineup-table td {
   font-size: 12px;
-  padding: 4px var(--pad-card);
+  padding: 5px 8px;
   color: var(--text);
+  border-bottom: 1px solid var(--border-alt);
+  overflow: hidden;
 }
+
+.lineup-table tbody tr:last-child td { border-bottom: none; }
 
 .lineup-pos {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
-  width: 48px;
+  width: 44px;
+  padding-left: var(--pad-card);
 }
 
-.lineup-player { font-weight: 400; }
+.lineup-player {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lineup-stat {
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.lineup-stat:last-child { padding-right: var(--pad-card); }
 
 /* ── Global card footer ── */
 .card-footer {
@@ -985,7 +1026,7 @@ html, body {
    MOBILE  (≤ 700px)
    ================================================================ */
 @media (max-width: 700px) {
-  :root { --track-pad: 40px; }
+  :root { --track-pad: 56px; }
 
   .app {
     grid-template-columns: 1fr;
