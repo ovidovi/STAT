@@ -8,15 +8,13 @@
       script-src 'self';
       style-src 'self' https://fonts.googleapis.com https://fonts.cdnfonts.com;
       font-src https://fonts.gstatic.com https://fonts.cdnfonts.com;
-      img-src 'self' https://img.mlbstatic.com;
+      img-src 'self' https://img.mlbstatic.com https://www.mlbstatic.com;
       connect-src https://statsapi.mlb.com;
       frame-ancestors 'none';" />
   <title>STAT</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <!-- MedievalSharp from CDNfonts (primary) -->
   <link href="https://fonts.cdnfonts.com/css/medievalsharp" rel="stylesheet" />
-  <!-- Cinzel as fallback; Inter for UI -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -25,70 +23,52 @@
   <div class="app" id="app">
 
     <!-- ══════════════════════════════════════════
-         SIDEBAR — search, stack nav
+         SIDEBAR
     ══════════════════════════════════════════ -->
     <aside class="sidebar" id="sidebar">
 
-      <!-- Wordmark -->
       <div class="sidebar-wordmark">
         <span class="wordmark">STAT</span>
       </div>
 
-      <!-- Search block -->
       <div class="sidebar-search">
-        <!-- Player / Team toggle -->
         <div class="type-selector">
           <button class="type-btn active" data-type="player" id="btn-player">Player</button>
           <button class="type-btn" data-type="team" id="btn-team">Team</button>
         </div>
-        <!-- Search input + GO -->
         <div class="search-field">
           <div class="search-input-wrap">
-            <input
-              type="text"
-              id="search-input"
-              class="search-input"
+            <input type="text" id="search-input" class="search-input"
               placeholder="Search player or team…"
-              autocomplete="off"
-              autocorrect="off"
-              spellcheck="false"
-            />
+              autocomplete="off" autocorrect="off" spellcheck="false" />
           </div>
           <button class="go-btn" id="go-btn">GO</button>
         </div>
-        <!-- Autocomplete dropdown -->
         <ul class="autocomplete-list hidden" id="autocomplete-list"></ul>
       </div>
 
-      <!-- Current stack -->
       <div class="sidebar-stack" id="sidebar-stack">
         <div class="stack-label">Current Stack</div>
-        <ul class="stack-list" id="stack-list">
-          <!-- Populated by JS -->
-        </ul>
+        <ul class="stack-list" id="stack-list"></ul>
       </div>
 
-      <!-- Named (saved) stacks -->
       <div class="sidebar-named-stacks" id="sidebar-named-stacks">
         <div class="stack-label">Saved Stacks</div>
-        <ul class="named-stacks-list" id="named-stacks-list">
-          <!-- Populated by JS -->
-        </ul>
+        <ul class="named-stacks-list" id="named-stacks-list"></ul>
       </div>
 
-      <!-- Sidebar footer: save button -->
       <div class="sidebar-footer">
-        <button class="save-btn" id="save-btn">Save stack</button>
+        <button class="save-btn" id="save-btn">Save to Stack</button>
       </div>
 
     </aside>
 
     <!-- ══════════════════════════════════════════
-         MAIN — card stage
+         MAIN
     ══════════════════════════════════════════ -->
     <main class="main" id="main">
 
-      <!-- Mobile header: wordmark (left) + Player/Team toggle (right) -->
+      <!-- Mobile header -->
       <div class="mobile-header">
         <span class="wordmark">STAT</span>
         <div class="type-selector">
@@ -97,20 +77,14 @@
         </div>
       </div>
 
-      <!-- Mobile search: input + GO + STACKS -->
+      <!-- Mobile search -->
       <div class="mobile-search">
         <div class="search-row">
           <div class="search-field">
             <div class="search-input-wrap">
-              <input
-                type="text"
-                id="m-search-input"
-                class="search-input"
+              <input type="text" id="m-search-input" class="search-input"
                 placeholder="Search player or team…"
-                autocomplete="off"
-                autocorrect="off"
-                spellcheck="false"
-              />
+                autocomplete="off" autocorrect="off" spellcheck="false" />
             </div>
             <button class="go-btn" id="m-go-btn">GO</button>
           </div>
@@ -126,7 +100,7 @@
           <ul class="stack-list" id="m-stack-list"></ul>
         </div>
         <div class="dropdown-section">
-          <div class="stack-label">Other Stacks</div>
+          <div class="stack-label">Saved Stacks</div>
           <ul class="named-stacks-list" id="m-named-stacks-list"></ul>
         </div>
       </div>
@@ -148,99 +122,61 @@
         <div class="spinner"></div>
       </div>
 
-      <!-- Card stage -->
+      <!-- Card stage: track + global footer -->
       <div class="card-stage hidden" id="card-stage">
-        <div class="card-stack-wrap">
-          <!-- Ghost layers (depth effect) -->
-          <div class="ghost ghost-2"></div>
-          <div class="ghost ghost-1"></div>
 
-          <!-- Main card -->
-          <article class="card" id="card">
-
-            <!-- Card header: player identity -->
-            <header class="card-header" id="card-header">
-              <div class="card-identity">
-                <div class="card-name-wrap">
-                  <div class="card-name" id="card-name">—</div>
-                  <div class="card-meta" id="card-meta">—</div>
-                </div>
-              </div>
-            </header>
-
-            <!-- Highlight stats: AVG · OPS · WAR -->
-            <div class="card-highlights" id="card-highlights">
-              <div class="hl-cell" id="hl-avg">
-                <div class="hl-num">—</div>
-                <div class="hl-key">AVG</div>
-              </div>
-              <div class="hl-cell" id="hl-ops">
-                <div class="hl-num">—</div>
-                <div class="hl-key">OPS</div>
-              </div>
-              <div class="hl-cell" id="hl-war">
-                <div class="hl-num">—</div>
-                <div class="hl-key">WAR</div>
-              </div>
-            </div>
-
-            <!-- Season stat table -->
-            <div class="card-table-wrap" id="card-table-wrap">
-              <table class="stat-table" id="stat-table">
-                <thead>
-                  <tr class="table-head-row">
-                    <th class="col-year">Year</th>
-                    <th class="col-stat">G</th>
-                    <th class="col-stat">HR</th>
-                    <th class="col-stat">RBI</th>
-                    <th class="col-stat">AVG</th>
-                    <th class="col-stat">OBP</th>
-                    <th class="col-stat">SLG</th>
-                  </tr>
-                </thead>
-                <tbody id="stat-tbody">
-                  <!-- Populated by JS -->
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Card footer: Save Stack | ← dots count → | Remove Card -->
-            <footer class="card-footer">
-              <button class="footer-action-btn" id="save-stack-btn">Save Stack</button>
-              <div class="footer-center">
-                <button class="card-nav-btn" id="prev-btn" aria-label="Previous card">←</button>
-                <div class="stack-indicator" id="stack-indicator"></div>
-                <span class="stack-count" id="stack-count"></span>
-                <button class="card-nav-btn" id="next-btn" aria-label="Next card">→</button>
-              </div>
-              <button class="footer-action-btn footer-remove-btn" id="remove-card-btn">Remove</button>
-            </footer>
-
-          </article>
+        <!-- Horizontal card track (scroll-snap) -->
+        <div class="card-track" id="card-track">
+          <!-- Card slots populated by JS -->
         </div>
+
+        <!-- Global footer -->
+        <footer class="card-footer">
+          <button class="footer-action-btn footer-save-btn" id="save-stack-btn">Save to Stack</button>
+          <div class="footer-center">
+            <button class="card-nav-btn" id="prev-btn" aria-label="Previous card">←</button>
+            <div class="stack-indicator" id="stack-indicator"></div>
+            <span class="stack-count" id="stack-count"></span>
+            <button class="card-nav-btn" id="next-btn" aria-label="Next card">→</button>
+          </div>
+          <button class="footer-action-btn footer-remove-btn" id="remove-card-btn">Remove</button>
+        </footer>
+
       </div>
 
     </main>
   </div>
 
   <!-- ══════════════════════════════════════════
-       SAVE STACK DIALOG
+       SAVE TO STACK DIALOG
   ══════════════════════════════════════════ -->
   <div class="dialog-overlay hidden" id="dialog-overlay">
     <div class="dialog">
-      <div class="dialog-title">Name this stack</div>
+      <div class="dialog-title">Save to Stack</div>
+
+      <!-- Existing stacks (hidden when empty) -->
+      <div class="dialog-existing-section hidden" id="dialog-existing-section">
+        <div class="dialog-section-label">Add to existing</div>
+        <div class="dialog-existing-list" id="dialog-existing-list">
+          <!-- Populated by JS -->
+        </div>
+        <div class="dialog-divider"></div>
+      </div>
+
+      <!-- Create new stack -->
+      <div class="dialog-section-label">New stack</div>
       <input
         type="text"
         class="dialog-input"
         id="dialog-input"
-        placeholder="e.g. AL Sluggers 2024"
+        placeholder="Name this stack…"
         maxlength="40"
         autocomplete="off"
         spellcheck="false"
       />
       <div class="dialog-actions">
         <button class="dialog-btn dialog-cancel" id="dialog-cancel">Cancel</button>
-        <button class="dialog-btn dialog-confirm" id="dialog-confirm">Save</button>
+        <button class="dialog-btn dialog-confirm" id="dialog-confirm">Create & Save</button>
       </div>
     </div>
   </div>
