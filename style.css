@@ -1,43 +1,39 @@
 /* ================================================================
    STAT — style.css
-   Phase 3 production styles — built from Figma spec
    ================================================================ */
 
 /* ── Reset ──────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { overflow-x: hidden; }
 button { cursor: pointer; font-family: inherit; }
 ul { list-style: none; }
 
-/* ── Design Tokens (from Figma variables) ───────────────────────── */
+/* ── Design Tokens ──────────────────────────────────────────────── */
 :root {
-  /* Colors */
-  --bg:           #030228;   /* page / app background        */
-  --sidebar:      #15142b;   /* left panel                   */
-  --card:         #0b071e;   /* main card                    */
-  --ghost:        #292a40;   /* ghost layers + active states */
-  --border:       #3b4250;   /* primary border (blue-grey)   */
-  --border-alt:   #2a2a2a;   /* secondary border (darker)    */
-  --input-bg:     #030228;   /* search field background      */
-  --text:         #cccccc;   /* primary text                 */
-  --text-bright:  #e4e4e4;   /* labels, secondary bright     */
-  --text-white:   #ffffff;   /* table values                 */
-  --muted:        #707070;   /* secondary / inactive text    */
-  --accent:       #ff6b2b;   /* orange accent                */
+  --bg:           #030228;
+  --sidebar:      #15142b;
+  --card:         #0b071e;
+  --ghost:        #292a40;
+  --border:       #3b4250;
+  --border-alt:   #2a2a2a;
+  --input-bg:     #030228;
+  --text:         #cccccc;
+  --text-bright:  #e4e4e4;
+  --text-white:   #ffffff;
+  --muted:        #707070;
+  --accent:       #ff6b2b;
 
-  /* Typography — MedievalSharp from CDNfonts, Cinzel as fallback */
   --font-ui:      'Inter', sans-serif;
   --font-mark:    'MedievalSharp', 'Cinzel', serif;
 
-  /* Sidebar */
   --sidebar-width: 259px;
-
-  /* Spacing */
   --pad-panel:    18px;
-  --pad-card:     20px;
-
-  /* Radius */
+  --pad-card:     24px;
   --radius-card:  10px;
-  --radius-sm:    3px;
+  --radius-sm:    4px;
+
+  /* Card track peek */
+  --track-pad:    64px;
 }
 
 /* ── Base ───────────────────────────────────────────────────────── */
@@ -47,10 +43,9 @@ html, body {
   color: var(--text);
   font-family: var(--font-ui);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── App shell: sidebar | main ──────────────────────────────────── */
+/* ── App shell ──────────────────────────────────────────────────── */
 .app {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
@@ -73,7 +68,6 @@ html, body {
   scrollbar-color: var(--ghost) transparent;
 }
 
-/* ── Wordmark ── */
 .sidebar-wordmark {
   padding: 0 var(--pad-panel);
   height: 46px;
@@ -94,7 +88,7 @@ html, body {
   user-select: none;
 }
 
-/* ── Search block ── */
+/* ── Search ── */
 .sidebar-search {
   padding: 16px var(--pad-panel);
   border-bottom: 1px solid var(--border-alt);
@@ -102,10 +96,9 @@ html, body {
   position: relative;
 }
 
-/* Player / Team toggle */
 .type-selector {
   display: flex;
-  margin-bottom: 7px;
+  margin-bottom: 8px;
 }
 
 .type-btn {
@@ -131,7 +124,6 @@ html, body {
   color: var(--accent);
 }
 
-/* Search input row */
 .search-field {
   display: flex;
   border: 1px solid var(--border-alt);
@@ -139,10 +131,7 @@ html, body {
   overflow: hidden;
 }
 
-.search-input-wrap {
-  flex: 1;
-  min-width: 0;
-}
+.search-input-wrap { flex: 1; min-width: 0; }
 
 .search-input {
   width: 100%;
@@ -152,7 +141,6 @@ html, body {
   color: var(--text-bright);
   font-family: var(--font-ui);
   font-size: 13px;
-  font-weight: 400;
   padding: 8px 11px;
 }
 
@@ -173,7 +161,7 @@ html, body {
 }
 
 .go-btn:hover  { opacity: 0.85; }
-.go-btn:active { opacity: 0.7;  }
+.go-btn:active { opacity: 0.7; }
 
 /* Autocomplete */
 .autocomplete-list {
@@ -212,7 +200,7 @@ html, body {
   margin-top: 2px;
 }
 
-/* ── Current stack navigator ── */
+/* ── Stack list ── */
 .sidebar-stack {
   flex: 1;
   display: flex;
@@ -245,7 +233,6 @@ html, body {
   gap: 12px;
   padding: 10px var(--pad-panel);
   border-left: 2px solid transparent;
-  border-bottom: 1px solid transparent;
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s;
 }
@@ -256,8 +243,8 @@ html, body {
 }
 
 .stack-item-avatar {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: var(--border);
   flex-shrink: 0;
@@ -267,11 +254,23 @@ html, body {
   justify-content: center;
 }
 
+/* Team logo in sidebar: square, no circle crop */
+.stack-item-avatar.is-logo {
+  border-radius: 4px;
+  background: transparent;
+  align-items: center;
+}
+
 .stack-item-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: top;
+}
+
+.stack-item-avatar.is-logo img {
+  object-fit: contain;
+  object-position: center;
 }
 
 .stack-item-avatar .avatar-placeholder {
@@ -285,7 +284,6 @@ html, body {
 .stack-item-name {
   font-size: 13px;
   font-weight: 700;
-  letter-spacing: -0.01em;
   color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
@@ -296,7 +294,6 @@ html, body {
 
 .stack-item-sub {
   font-size: 11px;
-  font-weight: 400;
   color: var(--muted);
   margin-top: 2px;
   white-space: nowrap;
@@ -311,7 +308,6 @@ html, body {
   border: none;
   color: var(--muted);
   font-size: 14px;
-  line-height: 1;
   opacity: 0;
   padding: 2px 4px;
   transition: opacity 0.15s, color 0.15s;
@@ -321,7 +317,7 @@ html, body {
 .stack-item:hover .stack-item-remove { opacity: 1; }
 .stack-item-remove:hover { color: var(--accent); }
 
-/* ── Named (saved) stacks ── */
+/* ── Named stacks ── */
 .sidebar-named-stacks {
   display: flex;
   flex-direction: column;
@@ -345,7 +341,6 @@ html, body {
 }
 
 .named-stack-item:last-child { border-bottom: none; }
-
 .named-stack-info { flex: 1; min-width: 0; }
 
 .named-stack-name {
@@ -357,18 +352,13 @@ html, body {
   text-overflow: ellipsis;
 }
 
-.named-stack-sub {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 2px;
-}
+.named-stack-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
 
 .named-stack-load {
   background: none;
   border: 1px solid var(--border);
   color: var(--muted);
   font-size: 16px;
-  font-weight: 400;
   width: 26px;
   height: 26px;
   border-radius: var(--radius-sm);
@@ -376,14 +366,10 @@ html, body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  line-height: 1;
   transition: color 0.15s, border-color 0.15s;
 }
 
-.named-stack-load:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-}
+.named-stack-load:hover { color: var(--accent); border-color: var(--accent); }
 
 .named-stack-empty {
   padding: 12px var(--pad-panel);
@@ -402,41 +388,31 @@ html, body {
 .save-btn {
   width: 100%;
   background: none;
-  border: 1px solid var(--border);
-  color: var(--muted);
+  border: 1px solid var(--accent);
+  color: var(--accent);
   font-family: var(--font-ui);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 8px;
+  padding: 9px;
   border-radius: var(--radius-sm);
-  transition: color 0.15s, border-color 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
 
-.save-btn:hover {
-  color: var(--text);
-  border-color: var(--text);
-}
-
-.save-btn.saved {
-  color: var(--accent);
-  border-color: var(--accent);
-}
+.save-btn:hover { background: var(--accent); color: #fff; }
+.save-btn.saved { background: var(--accent); color: #fff; }
 
 /* ================================================================
-   MAIN (card stage)
+   MAIN
    ================================================================ */
 .main {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  position: relative;
+  overflow: hidden;
 }
 
-/* Mobile header/search/dropdown — hidden on desktop */
 .mobile-header,
 .mobile-search,
 .mobile-stack-dropdown { display: none; }
@@ -467,14 +443,7 @@ html, body {
 }
 
 .empty-hint { font-size: 13px; color: var(--muted); }
-
-.error-msg {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--muted);
-  margin-bottom: 16px;
-}
-
+.error-msg  { font-size: 15px; font-weight: 600; color: var(--muted); margin-bottom: 16px; }
 .error-hint { font-size: 13px; color: var(--muted); }
 
 .suggestion-btn {
@@ -489,7 +458,6 @@ html, body {
   cursor: pointer;
 }
 
-/* Spinner */
 .spinner {
   width: 28px;
   height: 28px;
@@ -501,118 +469,155 @@ html, body {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ── Card stage ── */
+/* ================================================================
+   CARD STAGE — horizontal scroll-snap track
+   ================================================================ */
 .card-stage {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 52px 117px;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .card-stage.hidden { display: none; }
 
-/* Card stack wrapper */
-.card-stack-wrap {
-  position: relative;
-  width: 100%;
-  max-width: 480px;
+/* Horizontal scrolling track */
+.card-track {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-inline: var(--track-pad);
+  padding-block: 32px;
+  min-height: 0;
 }
 
-/* Ghost layers */
-.ghost {
-  position: absolute;
-  left: 50%;
-  background: var(--ghost);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  pointer-events: none;
+.card-track::-webkit-scrollbar { display: none; }
+
+/* Each card slot — width set via JS */
+.card-slot {
+  flex-shrink: 0;
+  display: flex;
+  scroll-snap-align: start;
 }
 
-.ghost-1 {
-  bottom: -23px;
-  width: calc(100% - 60px);
-  height: 48px;
-  transform: translateX(-50%);
-  opacity: 0.8;
-  z-index: 0;
-}
-
-.ghost-2 {
-  bottom: -42px;
-  width: calc(100% - 84px);
-  height: 48px;
-  transform: translateX(-50%);
-  opacity: 0.5;
-  z-index: -1;
-}
-
-/* ── Main card ── */
+/* ── Card ── */
 .card {
-  position: relative;
-  z-index: 1;
-  width: 100%;
+  flex: 1;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
-/* Card header */
+/* ── Card header: photo + identity ── */
 .card-header {
-  padding: 8px var(--pad-card) 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px var(--pad-card) 14px;
+  flex-shrink: 0;
 }
 
-.card-identity { display: flex; flex-direction: column; }
+/* Player headshot */
+.card-photo-wrap {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.card-photo-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.card-photo-wrap .avatar-placeholder {
+  width: 36px;
+  height: 44px;
+  opacity: 0.3;
+}
+
+/* Team logo */
+.card-logo-wrap {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-logo-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.card-identity { flex: 1; min-width: 0; }
 
 .card-name {
-  font-family: var(--font-ui);
-  font-size: 32px;
+  font-size: 26px;
   font-weight: 800;
-  letter-spacing: 0;
   color: var(--text);
   line-height: 1.1;
-  margin-top: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .card-meta {
   font-size: 11px;
-  font-weight: 400;
   color: var(--text-bright);
   margin-top: 4px;
   opacity: 0.7;
 }
 
-/* Highlight stats row */
+/* ── Highlights ── */
 .card-highlights {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
 .hl-cell {
-  padding: 16px 0 16px 24px;
+  padding: 14px 0 14px 24px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .hl-cell + .hl-cell { border-left: 1px solid var(--border-alt); }
 
 .hl-num {
-  font-size: 34px;
+  font-size: 32px;
   font-weight: 800;
-  letter-spacing: 0.016em;
+  letter-spacing: 0.01em;
   color: var(--accent);
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
 .hl-key {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -627,7 +632,7 @@ html, body {
   scrollbar-width: thin;
   scrollbar-color: var(--ghost) transparent;
   border-bottom: 1px solid var(--border);
-  max-height: 360px;
+  min-height: 0;
 }
 
 .stat-table {
@@ -636,7 +641,7 @@ html, body {
   table-layout: fixed;
 }
 
-.col-year { width: 91px; }
+.col-year { width: 88px; }
 .col-stat  { width: auto; }
 
 .table-head-row th {
@@ -654,12 +659,8 @@ html, body {
   border-bottom: 1px solid var(--border);
 }
 
-.table-head-row th:first-child {
-  text-align: left;
-  padding-left: var(--pad-card);
-}
-
-.table-head-row th:last-child { padding-right: var(--pad-card); }
+.table-head-row th:first-child { text-align: left; padding-left: var(--pad-card); }
+.table-head-row th:last-child  { padding-right: var(--pad-card); }
 
 .stat-row td {
   font-size: 13px;
@@ -667,7 +668,7 @@ html, body {
   font-variant-numeric: tabular-nums;
   color: var(--text-white);
   text-align: right;
-  padding: 11px 8px;
+  padding: 10px 8px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -685,68 +686,107 @@ html, body {
 
 .stat-row td:last-child { padding-right: var(--pad-card); }
 
-.stat-row.current td           { font-weight: 600; }
+.stat-row.current td             { font-weight: 600; }
 .stat-row.current td:first-child { color: var(--accent); }
+.stat-row.best                   { background: var(--sidebar); }
+.stat-row.best td:first-child    { color: var(--muted); }
 
-.stat-row.best                  { background: var(--sidebar); }
-.stat-row.best td:first-child   { color: var(--muted); }
+/* ── Depth chart (team cards) ── */
+.card-lineup {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  padding-bottom: 8px;
+}
 
-/* ── Card footer ── */
+.lineup-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px var(--pad-card) 6px;
+}
+
+.lineup-table { width: 100%; border-collapse: collapse; }
+
+.lineup-table td {
+  font-size: 12px;
+  padding: 4px var(--pad-card);
+  color: var(--text);
+}
+
+.lineup-pos {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  width: 48px;
+}
+
+.lineup-player { font-weight: 400; }
+
+/* ── Global card footer ── */
 .card-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px var(--pad-card);
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
   flex-shrink: 0;
   gap: 8px;
+  background: var(--bg);
 }
 
-/* Action buttons: Save Stack / Remove Card */
-.footer-action-btn {
+/* Save to Stack — primary filled button */
+.footer-save-btn {
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.footer-save-btn:hover  { opacity: 0.85; }
+.footer-save-btn:active { opacity: 0.7; }
+.footer-save-btn.saved  { opacity: 0.6; }
+
+/* Remove — ghost danger button */
+.footer-remove-btn {
   background: none;
   border: 1px solid var(--border);
   color: var(--muted);
   font-family: var(--font-ui);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 6px 10px;
+  padding: 8px 14px;
   border-radius: var(--radius-sm);
   flex-shrink: 0;
   white-space: nowrap;
   transition: color 0.15s, border-color 0.15s;
 }
 
-.footer-action-btn:hover {
-  color: var(--text);
-  border-color: var(--text);
-}
+.footer-remove-btn:hover { color: #e05050; border-color: #e05050; }
 
-.footer-action-btn.saved {
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
-.footer-remove-btn:hover {
-  color: #e05050;
-  border-color: #e05050;
-}
-
-/* Center: nav arrows + dots + count */
+/* Nav center */
 .footer-center {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   flex: 1;
   justify-content: center;
 }
 
-.stack-indicator {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
+.stack-indicator { display: flex; align-items: center; gap: 4px; }
 
 .ind-dot {
   width: 5px;
@@ -775,8 +815,8 @@ html, body {
   border: 1px solid var(--border);
   color: var(--muted);
   font-size: 13px;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -785,23 +825,16 @@ html, body {
   transition: color 0.15s, border-color 0.15s;
 }
 
-.card-nav-btn:hover {
-  color: var(--text);
-  border-color: var(--text);
-}
-
-.card-nav-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
+.card-nav-btn:hover    { color: var(--text); border-color: var(--text); }
+.card-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
 /* ================================================================
-   SAVE STACK DIALOG
+   SAVE TO STACK DIALOG
    ================================================================ */
 .dialog-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(3, 2, 40, 0.82);
+  background: rgba(3, 2, 40, 0.85);
   z-index: 200;
   display: flex;
   align-items: center;
@@ -817,7 +850,7 @@ html, body {
   border-radius: var(--radius-card);
   padding: 24px 20px 20px;
   width: 100%;
-  max-width: 320px;
+  max-width: 340px;
 }
 
 .dialog-title {
@@ -826,7 +859,80 @@ html, body {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 14px;
+  margin-bottom: 16px;
+}
+
+/* Existing stacks section */
+.dialog-existing-section.hidden { display: none; }
+
+.dialog-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.dialog-existing-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.dialog-stack-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border-alt);
+  border-radius: var(--radius-sm);
+}
+
+.dialog-stack-info { min-width: 0; flex: 1; }
+
+.dialog-stack-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.dialog-stack-count {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.dialog-add-btn {
+  background: none;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.dialog-add-btn:hover { background: var(--accent); color: #fff; }
+
+.dialog-divider {
+  border: none;
+  border-top: 1px solid var(--border-alt);
+  margin-bottom: 16px;
 }
 
 .dialog-input {
@@ -836,10 +942,11 @@ html, body {
   border-radius: var(--radius-sm);
   color: var(--text-bright);
   font-family: var(--font-ui);
-  font-size: 16px;   /* 16px prevents iOS zoom on focus */
+  font-size: 16px;
   font-weight: 600;
   padding: 10px 12px;
   outline: none;
+  margin-top: 8px;
   margin-bottom: 16px;
   transition: border-color 0.15s;
 }
@@ -847,11 +954,7 @@ html, body {
 .dialog-input:focus { border-color: var(--accent); }
 .dialog-input::placeholder { color: var(--muted); font-weight: 400; }
 
-.dialog-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
+.dialog-actions { display: flex; gap: 8px; justify-content: flex-end; }
 
 .dialog-btn {
   background: none;
@@ -867,10 +970,7 @@ html, body {
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 
-.dialog-cancel:hover {
-  color: var(--text);
-  border-color: var(--text);
-}
+.dialog-cancel:hover { color: var(--text); border-color: var(--text); }
 
 .dialog-confirm {
   background: var(--accent);
@@ -878,13 +978,15 @@ html, body {
   color: #fff;
 }
 
-.dialog-confirm:hover { opacity: 0.85; }
+.dialog-confirm:hover  { opacity: 0.85; }
 .dialog-confirm:active { opacity: 0.7; }
 
 /* ================================================================
    MOBILE  (≤ 700px)
    ================================================================ */
 @media (max-width: 700px) {
+  :root { --track-pad: 40px; }
+
   .app {
     grid-template-columns: 1fr;
     height: auto;
@@ -892,42 +994,39 @@ html, body {
     overflow: visible;
   }
 
-  /* Sidebar hidden on mobile */
   .sidebar { display: none; }
 
   .main {
     height: auto;
     min-height: 100vh;
     overflow: visible;
+    overflow-x: hidden;
   }
 
-  /* ── Mobile header: STAT wordmark (left) + Player/Team toggle (right) ── */
+  /* ── Mobile header ── */
   .mobile-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
-    height: 60px;
+    padding: 0 16px 0 20px;
+    height: 54px;
     border-bottom: 1px solid var(--border-alt);
-    flex-shrink: 0;
     background: var(--bg);
     position: sticky;
     top: 0;
     z-index: 20;
+    flex-shrink: 0;
   }
 
-  /* Larger wordmark on mobile */
-  .mobile-header .wordmark {
-    font-size: 42px;
-    letter-spacing: 0.02em;
-  }
+  /* 30% smaller than 42px = ~30px */
+  .mobile-header .wordmark { font-size: 30px; }
 
-  /* Type selector inline in header — no bottom margin */
-  .mobile-header .type-selector {
-    margin-bottom: 0;
-  }
+  .mobile-header .type-selector { margin-bottom: 0; }
 
-  /* ── Mobile search: [input + GO] [STACKS] in one row ── */
+  /* More padding on toggle buttons */
+  .mobile-header .type-btn { padding: 7px 14px; }
+
+  /* ── Mobile search ── */
   .mobile-search {
     display: block;
     padding: 10px 16px;
@@ -935,6 +1034,7 @@ html, body {
     background: var(--bg);
     position: relative;
     z-index: 15;
+    flex-shrink: 0;
   }
 
   .search-row {
@@ -943,12 +1043,8 @@ html, body {
     gap: 6px;
   }
 
-  .search-row .search-field {
-    flex: 1;
-    min-width: 0;
-  }
+  .search-row .search-field { flex: 1; min-width: 0; }
 
-  /* STACKS toggle button */
   .stacks-btn {
     background: none;
     border: 1px solid var(--border);
@@ -973,43 +1069,41 @@ html, body {
     background: var(--sidebar);
     border-bottom: 1px solid var(--border);
     z-index: 10;
-    max-height: 70vh;
+    max-height: 60vh;
     overflow-y: auto;
   }
 
   .mobile-stack-dropdown:not(.hidden) { display: block; }
-
-  .dropdown-section {
-    border-bottom: 1px solid var(--border-alt);
-  }
-
+  .dropdown-section { border-bottom: 1px solid var(--border-alt); }
   .dropdown-section:last-child { border-bottom: none; }
 
   /* ── Card stage on mobile ── */
   .card-stage {
-    padding: 24px 16px 60px;
-    align-items: flex-start;
+    flex: none;
+    overflow: visible;
   }
 
   .card-stage.hidden { display: none; }
 
-  .card-stack-wrap { max-width: 100%; }
-
-  .ghost-1 { bottom: -18px; }
-  .ghost-2 { bottom: -33px; }
-
-  .card-name { font-size: 24px; }
-  .hl-num    { font-size: 28px; }
-
-  .card-table-wrap { max-height: 280px; }
-
-  /* Footer action buttons a bit more compact on small screens */
-  .footer-action-btn {
-    font-size: 8px;
-    padding: 5px 8px;
+  .card-track {
+    overflow-x: scroll;
+    overflow-y: visible;
+    padding-block: 24px 16px;
+    align-items: flex-start;
   }
 
-  /* Empty / error states on mobile */
-  .empty-state,
-  .error-state { padding: 60px 24px; }
+  .card-slot { align-self: flex-start; }
+
+  .card { min-height: auto; }
+
+  .card-name { font-size: 20px; }
+  .hl-num    { font-size: 26px; }
+
+  .card-table-wrap { max-height: 260px; }
+
+  /* Footer on mobile: smaller text */
+  .footer-save-btn   { font-size: 9px; padding: 8px 10px; }
+  .footer-remove-btn { font-size: 9px; padding: 7px 10px; }
+
+  .empty-state, .error-state { padding: 60px 24px; }
 }
