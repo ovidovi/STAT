@@ -249,6 +249,7 @@ const dom = {
   loadingState:         $('loading-state'),
   cardStage:            $('card-stage'),
   cardTrack:            $('card-track'),
+  addCardBtn:           $('add-card-btn'),
   saveStackBtn:         $('save-stack-btn'),
   removeCardBtn:        $('remove-card-btn'),
   dialogOverlay:        $('dialog-overlay'),
@@ -832,7 +833,7 @@ function confirmSave() {
 }
 
 function showSaveFeedback() {
-  [dom.saveStackBtn, dom.saveBtn].forEach(btn => {
+  [dom.addCardBtn, dom.saveStackBtn, dom.saveBtn].forEach(btn => {
     const orig = btn.textContent;
     btn.textContent = 'Saved ✓';
     btn.classList.add('saved');
@@ -1232,6 +1233,7 @@ function init() {
     btn.addEventListener('click', () => setSearchType(btn.dataset.type))
   );
 
+  dom.addCardBtn.addEventListener('click', () => openSaveDialog(false));
   dom.saveStackBtn.addEventListener('click', () => openSaveDialog(true));
   dom.saveBtn.addEventListener('click', () => openSaveDialog(false));
   dom.removeCardBtn.addEventListener('click', removeCurrentCard);

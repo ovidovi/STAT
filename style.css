@@ -861,9 +861,9 @@ html, body {
 
 /* ── Global card footer ── */
 .card-footer {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   padding: 10px var(--track-pad);
   border-top: 1px solid var(--border);
   flex-shrink: 0;
@@ -871,26 +871,24 @@ html, body {
   background: var(--bg);
 }
 
-/* Save to Stack — primary filled button */
-.footer-save-btn {
-  background: var(--accent);
-  border: none;
-  color: #fff;
+/* Ghost footer buttons (Add This Card, Add All) */
+.footer-ghost-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
   font-family: var(--font-ui);
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 9px 14px;
+  padding: 8px 14px;
   border-radius: var(--radius-sm);
-  flex-shrink: 0;
   white-space: nowrap;
-  transition: opacity 0.15s;
+  transition: color 0.15s, border-color 0.15s;
 }
 
-.footer-save-btn:hover  { opacity: 0.85; }
-.footer-save-btn:active { opacity: 0.7; }
-.footer-save-btn.saved  { opacity: 0.6; }
+.footer-ghost-btn:hover { color: var(--text); border-color: var(--text); }
+.footer-ghost-btn.saved { color: var(--accent); border-color: var(--accent); }
 
 /* Remove — ghost danger button */
 .footer-remove-btn {
@@ -904,21 +902,12 @@ html, body {
   text-transform: uppercase;
   padding: 8px 14px;
   border-radius: var(--radius-sm);
-  flex-shrink: 0;
   white-space: nowrap;
+  justify-self: end;
   transition: color 0.15s, border-color 0.15s;
 }
 
 .footer-remove-btn:hover { color: #e05050; border-color: #e05050; }
-
-/* Nav center */
-.footer-center {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-  justify-content: center;
-}
 
 .stack-indicator { display: flex; align-items: center; gap: 4px; }
 
@@ -1208,7 +1197,7 @@ html, body {
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    padding: 0 12px;
+    padding: 8px 12px;
     border-radius: var(--radius-sm);
     flex-shrink: 0;
     white-space: nowrap;
@@ -1279,16 +1268,23 @@ html, body {
   /* Prevent iOS auto-zoom on input focus (triggers when font-size < 16px) */
   .search-input { font-size: 16px; }
 
-  /* Footer: sticky to viewport bottom on mobile */
+  /* Footer: fixed to viewport bottom on mobile */
   .card-footer {
-    position: sticky;
+    position: fixed;
     bottom: 0;
+    left: 0;
+    right: 0;
     z-index: 10;
   }
 
+  /* Prevent card content from hiding behind the fixed footer */
+  .card-track {
+    padding-bottom: 72px;
+  }
+
   /* Footer on mobile: smaller text */
-  .footer-save-btn   { font-size: 9px; padding: 8px 10px; }
-  .footer-remove-btn { font-size: 9px; padding: 7px 10px; }
+  .footer-ghost-btn  { font-size: 9px; padding: 7px 8px; }
+  .footer-remove-btn { font-size: 9px; padding: 7px 8px; }
 
   .empty-state, .error-state { padding: 60px 24px; }
 }
