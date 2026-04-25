@@ -194,10 +194,13 @@ const MLB = {
 
 /* ── State ──────────────────────────────────────────────────────── */
 const state = {
-  stack:          [],
-  current:        -1,
-  searchType:     'player',
-  searchDebounce: null,
+  stack:            [],
+  current:          -1,
+  searchType:       'player',
+  searchDebounce:   null,
+  previousStack:    null,
+  saveAllMode:      false,
+  pendingDeleteIdx: -1,
 };
 
 /*
@@ -229,6 +232,7 @@ const dom = {
   stackList:            $('stack-list'),
   namedStacksList:      $('named-stacks-list'),
   saveBtn:              $('save-btn'),
+  backBtn:              $('back-btn'),
   mSearchInput:         $('m-search-input'),
   mGoBtn:               $('m-go-btn'),
   mBtnPlayer:           $('m-btn-player'),
@@ -238,16 +242,13 @@ const dom = {
   mStackDropdown:       $('mobile-stack-dropdown'),
   mStackList:           $('m-stack-list'),
   mNamedStacksList:     $('m-named-stacks-list'),
+  mBackBtn:             $('m-back-btn'),
   emptyState:           $('empty-state'),
   errorState:           $('error-state'),
   errorMsg:             $('error-msg'),
   loadingState:         $('loading-state'),
   cardStage:            $('card-stage'),
   cardTrack:            $('card-track'),
-  stackIndicator:       $('stack-indicator'),
-  stackCount:           $('stack-count'),
-  prevBtn:              $('prev-btn'),
-  nextBtn:              $('next-btn'),
   saveStackBtn:         $('save-stack-btn'),
   removeCardBtn:        $('remove-card-btn'),
   dialogOverlay:        $('dialog-overlay'),
@@ -256,6 +257,10 @@ const dom = {
   dialogInput:          $('dialog-input'),
   dialogConfirm:        $('dialog-confirm'),
   dialogCancel:         $('dialog-cancel'),
+  deleteStackOverlay:   $('delete-stack-overlay'),
+  deleteStackMsg:       $('delete-stack-msg'),
+  deleteStackConfirm:   $('delete-stack-confirm'),
+  deleteStackCancel:    $('delete-stack-cancel'),
 };
 
 /* ── Show / hide states ─────────────────────────────────────────── */
@@ -325,7 +330,7 @@ function buildCardElement(card) {
 
   // Stat table
   const tableWrap = document.createElement('div');
-  tableWrap.className = 'card-table-wrap';
+  tableWrap.className = card.depthChart ? 'card-table-wrap team-table' : 'card-table-wrap';
   const table = document.createElement('table');
   table.className = 'stat-table';
 
@@ -429,7 +434,7 @@ function renderCardTrack() {
   });
   showState('card');
   scrollToCard(state.current, false);
-  renderStackIndicator();
+  updateActiveSlot();
 }
 
 function scrollToCard(idx, animate = true) {
@@ -455,7 +460,7 @@ function initScrollObserver() {
     if (closest !== state.current) {
       state.current = closest;
       persistStack();
-      renderStackIndicator();
+      updateActiveSlot();
       renderStackList();
     }
   };
@@ -520,7 +525,7 @@ function renderStackList() {
         state.current = idx;
         scrollToCard(idx);
         renderStackList();
-        renderStackIndicator();
+        updateActiveSlot();
       });
       removeBtn.addEventListener('click', () => removeFromStack(idx));
       list.appendChild(li);
@@ -528,15 +533,19 @@ function renderStackList() {
   });
 }
 
-/* ── Stack indicator ────────────────────────────────────────────── */
-function renderStackIndicator() {
-  dom.stackIndicator.innerHTML = state.stack.map((_, i) =>
-    `<span class="ind-dot${i === state.current ? ' active' : ''}"></span>`
-  ).join('');
-  const total = state.stack.length;
-  dom.stackCount.textContent = total > 0 ? `${state.current + 1} of ${total}` : '';
-  dom.prevBtn.disabled = state.current <= 0;
-  dom.nextBtn.disabled = state.current >= state.stack.length - 1;
+/* ── Active slot opacity ────────────────────────────────────────── */
+function updateActiveSlot() {
+  dom.cardTrack.querySelectorAll('.card-slot').forEach((slot, i) => {
+    slot.classList.toggle('is-active', i === state.current);
+  });
+  renderBackBtn();
+}
+
+function renderBackBtn() {
+  const show = !!state.previousStack;
+  [dom.backBtn, dom.mBackBtn].forEach(btn => {
+    if (btn) btn.classList.toggle('hidden', !show);
+  });
 }
 
 /* ── localStorage ───────────────────────────────────────────────── */
@@ -586,11 +595,36 @@ function renderNamedStacksList() {
       const loadBtn = document.createElement('button');
       loadBtn.className = 'named-stack-load';
       loadBtn.setAttribute('aria-label', `Load ${s.name}`);
-      loadBtn.textContent = '+';
+      loadBtn.textContent = '↑';
       loadBtn.addEventListener('click', () => loadNamedStackAt(idx));
 
-      li.append(infoDiv, loadBtn);
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'named-stack-delete';
+      deleteBtn.setAttribute('aria-label', `Delete ${s.name}`);
+      deleteBtn.textContent = '×';
+      deleteBtn.addEventListener('click', () => openDeleteStackDialog(idx));
+
+      li.append(infoDiv, loadBtn, deleteBtn);
       list.appendChild(li);
+
+      // Individual card rows with remove buttons
+      s.cards.forEach((card, cardIdx) => {
+        const cardLi = document.createElement('li');
+        cardLi.className = 'named-stack-card-item';
+
+        const cardName = document.createElement('span');
+        cardName.className = 'named-stack-card-name';
+        cardName.textContent = card.name;
+
+        const cardRemove = document.createElement('button');
+        cardRemove.className = 'named-stack-card-remove';
+        cardRemove.setAttribute('aria-label', `Remove ${card.name}`);
+        cardRemove.textContent = '×';
+        cardRemove.addEventListener('click', () => removeCardFromNamedStack(idx, cardIdx));
+
+        cardLi.append(cardName, cardRemove);
+        list.appendChild(cardLi);
+      });
     });
   });
 }
@@ -599,12 +633,62 @@ function loadNamedStackAt(idx) {
   const all = loadNamedStacks();
   const s = all[idx];
   if (!s?.cards.length) return;
+  state.previousStack = state.stack.length
+    ? { stack: [...state.stack], current: state.current }
+    : null;
   state.stack   = [...s.cards];
   state.current = 0;
   renderCardTrack();
   renderStackList();
   renderNamedStacksList();
+  renderBackBtn();
   closeMobileDropdown();
+}
+
+function goBack() {
+  if (!state.previousStack) return;
+  state.stack         = state.previousStack.stack;
+  state.current       = state.previousStack.current;
+  state.previousStack = null;
+  renderCardTrack();
+  renderStackList();
+  renderBackBtn();
+}
+
+function removeCardFromNamedStack(stackIdx, cardIdx) {
+  const all = loadNamedStacks();
+  if (!all[stackIdx]) return;
+  all[stackIdx].cards.splice(cardIdx, 1);
+  if (all[stackIdx].cards.length === 0) all.splice(stackIdx, 1);
+  try {
+    localStorage.setItem('stat_named_stacks', JSON.stringify(all));
+  } catch (e) {}
+  renderNamedStacksList();
+}
+
+function openDeleteStackDialog(idx) {
+  const all = loadNamedStacks();
+  if (!all[idx]) return;
+  state.pendingDeleteIdx = idx;
+  dom.deleteStackMsg.textContent = `Delete "${all[idx].name}"? This cannot be undone.`;
+  dom.deleteStackOverlay.classList.remove('hidden');
+}
+
+function confirmDeleteStack() {
+  if (state.pendingDeleteIdx < 0) return;
+  const all = loadNamedStacks();
+  all.splice(state.pendingDeleteIdx, 1);
+  try {
+    localStorage.setItem('stat_named_stacks', JSON.stringify(all));
+  } catch (e) {}
+  state.pendingDeleteIdx = -1;
+  dom.deleteStackOverlay.classList.add('hidden');
+  renderNamedStacksList();
+}
+
+function closeDeleteDialog() {
+  state.pendingDeleteIdx = -1;
+  dom.deleteStackOverlay.classList.add('hidden');
 }
 
 /* ── Stack management ───────────────────────────────────────────── */
@@ -614,7 +698,7 @@ function addToStack(card) {
     state.current = existing;
     scrollToCard(existing);
     renderStackList();
-    renderStackIndicator();
+    updateActiveSlot();
     return;
   }
 
@@ -632,7 +716,7 @@ function addToStack(card) {
   showState('card');
   scrollToCard(state.current);
   renderStackList();
-  renderStackIndicator();
+  updateActiveSlot();
 }
 
 function removeFromStack(idx) {
@@ -649,7 +733,7 @@ function removeFromStack(idx) {
 
   persistStack();
   renderStackList();
-  renderStackIndicator();
+  updateActiveSlot();
 }
 
 function removeCurrentCard() {
@@ -658,8 +742,10 @@ function removeCurrentCard() {
 }
 
 /* ── Save to Stack dialog ───────────────────────────────────────── */
-function openSaveDialog() {
-  if (state.current < 0 || !state.stack[state.current]) return;
+function openSaveDialog(allMode = false) {
+  if (!state.stack.length) return;
+  if (!allMode && (state.current < 0 || !state.stack[state.current])) return;
+  state.saveAllMode = allMode;
 
   // Populate existing stacks
   const all = loadNamedStacks();
@@ -704,19 +790,19 @@ function closeDialog() {
 }
 
 function addCardToNamedStack(stackIdx) {
-  const card = state.stack[state.current];
-  if (!card) return;
+  const cards = state.saveAllMode ? state.stack : [state.stack[state.current]];
+  if (!cards.length) return;
   const all = loadNamedStacks();
   if (!all[stackIdx]) return;
 
-  const already = all[stackIdx].cards.some(c => c.id === card.id && c.type === card.type);
-  if (!already) {
-    all[stackIdx].cards.push(card);
-    try {
-      localStorage.setItem('stat_named_stacks', JSON.stringify(all));
-    } catch (e) {
-      return; // quota — no feedback needed, dialog still closes
-    }
+  cards.forEach(card => {
+    const already = all[stackIdx].cards.some(c => c.id === card.id && c.type === card.type);
+    if (!already) all[stackIdx].cards.push(card);
+  });
+  try {
+    localStorage.setItem('stat_named_stacks', JSON.stringify(all));
+  } catch (e) {
+    return;
   }
   closeDialog();
   renderNamedStacksList();
@@ -726,12 +812,12 @@ function addCardToNamedStack(stackIdx) {
 function confirmSave() {
   const name = dom.dialogInput.value.trim();
   if (!name) { dom.dialogInput.focus(); return; }
-  const card = state.stack[state.current];
-  if (!card) return;
+  const cards = state.saveAllMode ? state.stack : [state.stack[state.current]];
+  if (!cards.length) return;
 
   try {
     const all = loadNamedStacks();
-    all.push({ name, cards: [card], createdAt: Date.now() });
+    all.push({ name, cards: [...cards], createdAt: Date.now() });
     localStorage.setItem('stat_named_stacks', JSON.stringify(all));
   } catch (e) {
     dom.dialogInput.value = '';
@@ -1078,7 +1164,7 @@ function navigate(dir) {
   persistStack();
   scrollToCard(state.current);
   renderStackList();
-  renderStackIndicator();
+  updateActiveSlot();
 }
 
 /* ── Type toggle ────────────────────────────────────────────────── */
@@ -1146,13 +1232,13 @@ function init() {
     btn.addEventListener('click', () => setSearchType(btn.dataset.type))
   );
 
-  dom.prevBtn.addEventListener('click', () => navigate(-1));
-  dom.nextBtn.addEventListener('click', () => navigate(+1));
-
-  dom.saveStackBtn.addEventListener('click', openSaveDialog);
-  dom.saveBtn.addEventListener('click', openSaveDialog);
+  dom.saveStackBtn.addEventListener('click', () => openSaveDialog(true));
+  dom.saveBtn.addEventListener('click', () => openSaveDialog(false));
   dom.removeCardBtn.addEventListener('click', removeCurrentCard);
   dom.mStacksBtn.addEventListener('click', toggleMobileDropdown);
+
+  dom.backBtn.addEventListener('click', goBack);
+  dom.mBackBtn.addEventListener('click', () => { goBack(); closeMobileDropdown(); });
 
   dom.dialogConfirm.addEventListener('click', confirmSave);
   dom.dialogCancel.addEventListener('click', closeDialog);
@@ -1162,6 +1248,12 @@ function init() {
   dom.dialogInput.addEventListener('keydown', e => {
     if (e.key === 'Enter')  confirmSave();
     if (e.key === 'Escape') closeDialog();
+  });
+
+  dom.deleteStackConfirm.addEventListener('click', confirmDeleteStack);
+  dom.deleteStackCancel.addEventListener('click', closeDeleteDialog);
+  dom.deleteStackOverlay.addEventListener('click', e => {
+    if (e.target === dom.deleteStackOverlay) closeDeleteDialog();
   });
 
   document.querySelectorAll('.suggestion-btn').forEach(btn => {

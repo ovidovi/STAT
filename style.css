@@ -245,12 +245,12 @@ html, body {
 .stack-item-avatar {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
+  border-radius: 4px;
   background: var(--border);
   flex-shrink: 0;
   overflow: hidden;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
 }
 
@@ -265,7 +265,7 @@ html, body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: top;
+  object-position: center center;
 }
 
 .stack-item-avatar.is-logo img {
@@ -317,6 +317,30 @@ html, body {
 .stack-item:hover .stack-item-remove { opacity: 1; }
 .stack-item-remove:hover { color: var(--accent); }
 
+/* ── Stack section header (label + back button) ── */
+.stack-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: var(--pad-panel);
+}
+
+.stack-section-header .stack-label { padding-right: 0; }
+
+.back-btn {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 4px 0;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.back-btn:hover { opacity: 0.75; }
+.back-btn.hidden { display: none; }
+
 /* ── Named stacks ── */
 .sidebar-named-stacks {
   display: flex;
@@ -358,7 +382,7 @@ html, body {
   background: none;
   border: 1px solid var(--border);
   color: var(--muted);
-  font-size: 16px;
+  font-size: 14px;
   width: 26px;
   height: 26px;
   border-radius: var(--radius-sm);
@@ -370,6 +394,59 @@ html, body {
 }
 
 .named-stack-load:hover { color: var(--accent); border-color: var(--accent); }
+
+.named-stack-delete {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 16px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+  padding: 0;
+}
+
+.named-stack-item:hover .named-stack-delete { opacity: 1; }
+.named-stack-delete:hover { color: #e05050; }
+
+/* Individual cards within a saved stack */
+.named-stack-card-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px var(--pad-panel) 5px calc(var(--pad-panel) + 10px);
+  border-bottom: 1px solid var(--border-alt);
+}
+
+.named-stack-card-item:last-child { border-bottom: none; }
+
+.named-stack-card-name {
+  font-size: 12px;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.named-stack-card-remove {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 2px 4px;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.named-stack-card-item:hover .named-stack-card-remove { opacity: 1; }
+.named-stack-card-remove:hover { color: #e05050; }
 
 .named-stack-empty {
   padding: 12px var(--pad-panel);
@@ -506,7 +583,11 @@ html, body {
   flex-shrink: 0;
   display: flex;
   scroll-snap-align: start;
+  opacity: 0.6;
+  transition: opacity 0.25s;
 }
+
+.card-slot.is-active { opacity: 1; }
 
 /* ── Card ── */
 .card {
@@ -696,10 +777,19 @@ html, body {
 .stat-row.best                   { background: var(--sidebar); }
 .stat-row.best td:first-child    { color: var(--muted); }
 
+/* Team card: stat table compact, depth chart fills remaining space */
+.card-table-wrap.team-table {
+  flex: 0 0 auto;
+}
+
 /* ── Depth chart (team cards) ── */
 .card-lineup {
-  flex-shrink: 0;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   border-top: 1px solid var(--border);
+  scrollbar-width: thin;
+  scrollbar-color: var(--ghost) transparent;
 }
 
 .lineup-label {
@@ -708,7 +798,7 @@ html, body {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted);
-  padding: 10px var(--pad-card) 6px;
+  padding: 12px var(--pad-card) 8px;
 }
 
 .lineup-table {
@@ -735,7 +825,7 @@ html, body {
 
 .lineup-table td {
   font-size: 12px;
-  padding: 5px 8px;
+  padding: 8px 8px;
   color: var(--text);
   border-bottom: 1px solid var(--border-alt);
   overflow: hidden;
@@ -774,7 +864,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 20px;
+  padding: 10px var(--track-pad);
   border-top: 1px solid var(--border);
   flex-shrink: 0;
   gap: 8px;
@@ -1025,6 +1115,23 @@ html, body {
 .dialog-confirm:hover  { opacity: 0.85; }
 .dialog-confirm:active { opacity: 0.7; }
 
+/* Delete stack dialog */
+.delete-stack-msg {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.dialog-delete {
+  background: #c0392b;
+  border-color: #c0392b;
+  color: #fff;
+}
+
+.dialog-delete:hover  { opacity: 0.85; }
+.dialog-delete:active { opacity: 0.7; }
+
 /* ================================================================
    MOBILE  (≤ 700px)
    ================================================================ */
@@ -1065,11 +1172,6 @@ html, body {
   /* 30% smaller than 42px = ~30px */
   .mobile-header .wordmark { font-size: 30px; }
 
-  .mobile-header .type-selector { margin-bottom: 0; }
-
-  /* More padding on toggle buttons */
-  .mobile-header .type-btn { padding: 7px 14px; }
-
   /* ── Mobile search ── */
   .mobile-search {
     display: block;
@@ -1088,6 +1190,14 @@ html, body {
   }
 
   .search-row .search-field { flex: 1; min-width: 0; }
+
+  /* Type toggle in search row */
+  .mobile-search .type-selector {
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .mobile-search .type-btn { padding: 7px 10px; }
 
   .stacks-btn {
     background: none;
@@ -1168,6 +1278,13 @@ html, body {
 
   /* Prevent iOS auto-zoom on input focus (triggers when font-size < 16px) */
   .search-input { font-size: 16px; }
+
+  /* Footer: sticky to viewport bottom on mobile */
+  .card-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+  }
 
   /* Footer on mobile: smaller text */
   .footer-save-btn   { font-size: 9px; padding: 8px 10px; }

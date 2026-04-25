@@ -48,7 +48,10 @@
       </div>
 
       <div class="sidebar-stack" id="sidebar-stack">
-        <div class="stack-label">Current Stack</div>
+        <div class="stack-section-header">
+          <div class="stack-label">Current Stack</div>
+          <button class="back-btn hidden" id="back-btn">← Return</button>
+        </div>
         <ul class="stack-list" id="stack-list"></ul>
       </div>
 
@@ -71,15 +74,16 @@
       <!-- Mobile header -->
       <div class="mobile-header">
         <span class="wordmark">STAT</span>
-        <div class="type-selector">
-          <button class="type-btn active" data-type="player" id="m-btn-player">Player</button>
-          <button class="type-btn" data-type="team" id="m-btn-team">Team</button>
-        </div>
+        <button class="stacks-btn" id="m-stacks-btn">Stacks</button>
       </div>
 
       <!-- Mobile search -->
       <div class="mobile-search">
         <div class="search-row">
+          <div class="type-selector">
+            <button class="type-btn active" data-type="player" id="m-btn-player">Player</button>
+            <button class="type-btn" data-type="team" id="m-btn-team">Team</button>
+          </div>
           <div class="search-field">
             <div class="search-input-wrap">
               <input type="text" id="m-search-input" class="search-input"
@@ -88,7 +92,6 @@
             </div>
             <button class="go-btn" id="m-go-btn">GO</button>
           </div>
-          <button class="stacks-btn" id="m-stacks-btn">Stacks</button>
         </div>
         <ul class="autocomplete-list hidden" id="m-autocomplete-list"></ul>
       </div>
@@ -96,7 +99,10 @@
       <!-- Mobile stack dropdown -->
       <div class="mobile-stack-dropdown hidden" id="mobile-stack-dropdown">
         <div class="dropdown-section">
-          <div class="stack-label">Current Stack</div>
+          <div class="stack-section-header">
+            <div class="stack-label">Current Stack</div>
+            <button class="back-btn hidden" id="m-back-btn">← Return</button>
+          </div>
           <ul class="stack-list" id="m-stack-list"></ul>
         </div>
         <div class="dropdown-section">
@@ -132,13 +138,7 @@
 
         <!-- Global footer -->
         <footer class="card-footer">
-          <button class="footer-action-btn footer-save-btn" id="save-stack-btn">Save to Stack</button>
-          <div class="footer-center">
-            <button class="card-nav-btn" id="prev-btn" aria-label="Previous card">←</button>
-            <div class="stack-indicator" id="stack-indicator"></div>
-            <span class="stack-count" id="stack-count"></span>
-            <button class="card-nav-btn" id="next-btn" aria-label="Next card">→</button>
-          </div>
+          <button class="footer-action-btn footer-save-btn" id="save-stack-btn">+ Add All to Stack</button>
           <button class="footer-action-btn footer-remove-btn" id="remove-card-btn">Remove</button>
         </footer>
 
@@ -177,6 +177,20 @@
       <div class="dialog-actions">
         <button class="dialog-btn dialog-cancel" id="dialog-cancel">Cancel</button>
         <button class="dialog-btn dialog-confirm" id="dialog-confirm">Create & Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       DELETE STACK DIALOG
+  ══════════════════════════════════════════ -->
+  <div class="dialog-overlay hidden" id="delete-stack-overlay">
+    <div class="dialog">
+      <div class="dialog-title">Delete Stack</div>
+      <p class="delete-stack-msg" id="delete-stack-msg">Delete this stack? This cannot be undone.</p>
+      <div class="dialog-actions">
+        <button class="dialog-btn dialog-cancel" id="delete-stack-cancel">Cancel</button>
+        <button class="dialog-btn dialog-delete" id="delete-stack-confirm">Delete</button>
       </div>
     </div>
   </div>
