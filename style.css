@@ -588,6 +588,9 @@ html, body {
   color: var(--text-bright);
   margin-top: 4px;
   opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ── Highlights ── */
@@ -1026,7 +1029,7 @@ html, body {
    MOBILE  (≤ 700px)
    ================================================================ */
 @media (max-width: 700px) {
-  :root { --track-pad: 56px; }
+  :root { --track-pad: 44px; }
 
   .app {
     grid-template-columns: 1fr;
@@ -1129,18 +1132,39 @@ html, body {
   .card-track {
     overflow-x: scroll;
     overflow-y: visible;
-    padding-block: 24px 16px;
+    padding-block: 16px 12px;
     align-items: flex-start;
   }
 
   .card-slot { align-self: flex-start; }
 
-  .card { min-height: auto; }
+  /* Card fills available viewport height on mobile */
+  .card {
+    min-height: calc(100dvh - 54px - 55px - 49px - 28px);
+    overflow: clip; /* clips border-radius without blocking child scroll containers */
+  }
 
   .card-name { font-size: 20px; }
   .hl-num    { font-size: 26px; }
 
-  .card-table-wrap { max-height: 260px; }
+  /* Stat table: tighter padding so 7 columns fit, scrollable as fallback */
+  .stat-table {
+    width: auto;
+    min-width: 100%;
+    table-layout: auto;
+  }
+
+  .table-head-row th         { padding: 10px 5px; }
+  .table-head-row th:first-child { padding-left: 14px; }
+  .table-head-row th:last-child  { padding-right: 14px; }
+
+  .stat-row td               { padding: 10px 5px; }
+  .stat-row td:first-child   { padding-left: 14px; }
+  .stat-row td:last-child    { padding-right: 14px; }
+
+  .col-year { width: 70px; }
+
+  .card-table-wrap { max-height: none; }
 
   /* Footer on mobile: smaller text */
   .footer-save-btn   { font-size: 9px; padding: 8px 10px; }
