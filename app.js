@@ -412,7 +412,7 @@ function buildCardElement(card) {
 
 /* ── Card track ─────────────────────────────────────────────────── */
 function slotWidth() {
-  const peek = window.innerWidth <= 700 ? 56 : 72;
+  const peek = window.innerWidth <= 700 ? 44 : 72;
   const sidebarW = window.innerWidth > 700 ? 259 : 0;
   return Math.max(200, window.innerWidth - sidebarW - peek * 2);
 }
@@ -436,7 +436,7 @@ function scrollToCard(idx, animate = true) {
   const slots = dom.cardTrack.querySelectorAll('.card-slot');
   if (!slots[idx]) return;
   const slot = slots[idx];
-  const peek = window.innerWidth <= 700 ? 56 : 72;
+  const peek = window.innerWidth <= 700 ? 44 : 72;
   const targetLeft = slot.offsetLeft - peek;
   dom.cardTrack.scrollTo({ left: targetLeft, behavior: animate ? 'smooth' : 'instant' });
 }
