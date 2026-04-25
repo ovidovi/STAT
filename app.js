@@ -412,7 +412,7 @@ function buildCardElement(card) {
 
 /* ── Card track ─────────────────────────────────────────────────── */
 function slotWidth() {
-  const peek = window.innerWidth <= 700 ? 44 : 72;
+  const peek = window.innerWidth <= 700 ? 20 : 72;
   const sidebarW = window.innerWidth > 700 ? 259 : 0;
   return Math.max(200, window.innerWidth - sidebarW - peek * 2);
 }
@@ -436,7 +436,7 @@ function scrollToCard(idx, animate = true) {
   const slots = dom.cardTrack.querySelectorAll('.card-slot');
   if (!slots[idx]) return;
   const slot = slots[idx];
-  const peek = window.innerWidth <= 700 ? 44 : 72;
+  const peek = window.innerWidth <= 700 ? 20 : 72;
   const targetLeft = slot.offsetLeft - peek;
   dom.cardTrack.scrollTo({ left: targetLeft, behavior: animate ? 'smooth' : 'instant' });
 }
@@ -813,8 +813,8 @@ function buildBatterCard(playerId, name, meta, sortedSeasons, saber) {
   const best    = sortedSeasons[bestIdx];
 
   // OPS+ from sabermetrics (wRC+ is the modern equivalent and often returned)
-  const opsPlus = saber?.wRCPlus
-    ? String(Math.round(parseFloat(saber.wRCPlus)))
+  const opsPlus = saber?.wRcPlus
+    ? String(Math.round(parseFloat(saber.wRcPlus)))
     : (saber?.opsPlus ? String(Math.round(parseFloat(saber.opsPlus))) : '—');
 
   const highlights = [
@@ -836,7 +836,7 @@ function buildBatterCard(playerId, name, meta, sortedSeasons, saber) {
       String(s.stat?.gamesPlayed ?? '—'),
       String(s.stat?.homeRuns    ?? '—'),
       String(s.stat?.rbi         ?? '—'),
-      fmtAvg(s.stat?.avg),
+      String(s.stat?.strikeOuts  ?? '—'),
       fmtAvg(s.stat?.obp),
       fmtAvg(s.stat?.slg),
     ],
@@ -850,7 +850,7 @@ function buildBatterCard(playerId, name, meta, sortedSeasons, saber) {
     headshotUrl: MLB.headshot(playerId),
     logoUrl: null,
     highlights,
-    cols: ['Year', 'G', 'HR', 'RBI', 'AVG', 'OBP', 'SLG'],
+    cols: ['Year', 'G', 'HR', 'RBI', 'SO', 'OBP', 'SLG'],
     seasons,
     depthChart: null,
   };
