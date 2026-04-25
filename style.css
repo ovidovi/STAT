@@ -1166,6 +1166,9 @@ html, body {
 
   .card-table-wrap { max-height: none; }
 
+  /* Prevent iOS auto-zoom on input focus (triggers when font-size < 16px) */
+  .search-input { font-size: 16px; }
+
   /* Footer on mobile: smaller text */
   .footer-save-btn   { font-size: 9px; padding: 8px 10px; }
   .footer-remove-btn { font-size: 9px; padding: 7px 10px; }
